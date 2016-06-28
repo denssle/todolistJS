@@ -8,6 +8,12 @@ function start() {
     console.log("Start done. ")
 }
 
+function updateAll(list) {
+  saveLists();
+  updateAllListsTable();
+  updateActiveList(list);
+}
+
 function getMilliseconds() {
   /**
   * Return the number of milliseconds since 1970/01/01;
@@ -33,8 +39,7 @@ function clickNewList() {
     };
     console.log("Create: " + list.id + " Name: " + list.name + " Typ:" + list.typ);
     all_lists.push(list);
-    saveLists();
-    updateAllListsTable();
+    updateAll(null);
 }
 
 function saveLists() {
@@ -113,9 +118,7 @@ function clickDeleteListButton() {
   }
   if (deleteIndex !== null) {
     all_lists.splice(deleteIndex, 1);
-    saveLists();
-    updateAllListsTable();
-    updateActiveList(null);
+    updateAll(null);
   }
 }
 
@@ -123,7 +126,7 @@ function updateActiveList(list) {
   var activListTable = document.getElementById('activListTable');
   activListTable.innerHTML = "";
   if(list !== null) {
-    var menueRow = activListTable.insertRow(-1);
+    var menueRow = activListTable.insertRow();
     fillMenueRow(list, menueRow);
 
     //create entries
@@ -131,10 +134,34 @@ function updateActiveList(list) {
       var entry = list.entries[i];
       console.log("debug " + entry.id)
       var row = activListTable.insertRow(i);
-      var cell = row.insertCell();
-      cell.appendChild(document.createTextNode(entry.value));
+      var deleteCell = row.insertCell();
+      deleteCell.appendChild(createDeleteEntryButton(entry.id));
+      var valueCell = row.insertCell();
+      valueCell.appendChild(document.createTextNode(entry.value));
     }
   }
+}
+
+function createDeleteEntryButton(entryID) {
+  var delteteEntryButton = document.createElement('input');
+  delteteEntryButton.addEventListener ('click', clickDeleteEntryButton, true);
+  delteteEntryButton.id = entryID;
+  delteteEntryButton.type = "button";
+  delteteEntryButton.value = "X";
+  return delteteEntryButton;
+}
+
+function clickDeleteEntryButton() {
+  var entryID = this.id;
+  var entry = getEntryForID(entryID);
+  var list = getListForID(entry.listID)
+  console.log("Ready to delete Entry: " + entry.id + " from " + list.name);
+  for(var i in list.entries) {
+    if(entry.id === list.entries[i].id) {
+      list.entries.splice(i, 1);
+    }
+  }
+  updateAll(list);
 }
 
 function fillMenueRow(list, menueRow) {
@@ -169,11 +196,11 @@ function clickNewEntry() {
   console.log("New entry for: " +  list.name+" : " + textValue);
   var newEntry = {
     value:textValue,
-    id: textValue+getMilliseconds()
-  };
+    id: textValue+getMilliseconds(),
+    listID: list.id
+    };
   list.entries.push(newEntry);
-  saveLists();
-  updateActiveList(list);
+  updateAll(list);
 }
 
 function getListForID(id) {
@@ -183,4 +210,15 @@ function getListForID(id) {
     }
   }
   return null;
+}
+
+function getEntryForID(id) {
+  for (var i in all_lists) {
+    var entries = all_lists[i].entries;
+    for (var j in entries) {
+      if (id === entries[j].id) {
+        return entries[j];
+      }
+    }
+  }
 }
