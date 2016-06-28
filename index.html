@@ -4,9 +4,10 @@
 <head>
   <meta charset="utf8" />
   <title>2do</title>
+  <link rel="stylesheet" href="first.css">
 </head>
 <body>
-  <form>
+  <form id="newListForm">
     <label>Neue Liste
     <input type="text" id="newListName">
     <label>Typ
@@ -16,13 +17,12 @@
         <option value="z">z</option>
       </select>
     </label>
-    <button id="createNewListButton">Erstellen</button>
+    <input type="button" id="createNewListButton" value="Erstellen">
     </label>
   </form>
-  <br>
-  <div>
-    <table id="allListsTable"></table>
-  </div>
+
+  <table id="allListsTable"></table>
+
   <script type="text/javascript" src="persistence.js"></script>
 </body>
 </html>
