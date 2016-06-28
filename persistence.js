@@ -1,7 +1,5 @@
 start();
 var all_lists = getSavedLists();
-var globalID = 0;
-var activListID = null;
 
 function start() {
     var createNewListButton = document.getElementById('createNewListButton');
@@ -27,17 +25,15 @@ function clickNewList() {
     var newListName  = document.getElementById('newListName').value;
     var typ = document.getElementById('newListTyp');
     var selectedTyp = typ.options[typ.selectedIndex].value;
-    var newID = globalID + 2;
     var list = {
         name:   newListName,
         typ:   selectedTyp,
-        id:  newID+selectedTyp+newListName+getMilliseconds(),
-        entries: {}
+        id:  selectedTyp+newListName+getMilliseconds(),
+        entries: new Array
     };
     console.log("Create: " + list.id + " Name: " + list.name + " Typ:" + list.typ);
     all_lists.push(list);
     saveLists();
-    globalID = newID + 1;
     updateAllListsTable();
 }
 
@@ -74,10 +70,10 @@ function updateAllListsTable() {
           var name_cell = row.insertCell(0);
           name_cell.appendChild(document.createTextNode(list.name));
           name_cell.id = list.id;
-          var button_cell = row.insertCell(1);
-          button_cell.appendChild(createChooseListButton(list.id));
-        } else {
-          console.log(list);
+          var chooseListCell = row.insertCell(1);
+          chooseListCell.appendChild(createChooseListButton(list.id));
+          var deleteListCell = row.insertCell(2);
+          deleteListCell.appendChild(createDeleteListButton(list.id));
         }
   }
 }
@@ -91,34 +87,69 @@ function createChooseListButton(listID) {
   return chooseListButton;
 }
 
+function createDeleteListButton(listID) {
+  var delteteListeButton = document.createElement('input');
+  delteteListeButton.addEventListener ('click', clickDeleteListButton, true);
+  delteteListeButton.id = listID;
+  delteteListeButton.type = "button";
+  delteteListeButton.value = "Delete";
+  return delteteListeButton;
+}
+
 function clickChooseListButton() {
   var list = getListForID(this.id);
   console.log("Found: "+list.name);
   updateActiveList(list);
 }
 
+function clickDeleteListButton() {
+  var list = getListForID(this.id);
+  console.log("Ready to delete: "+list.name);
+  var deleteIndex = null;
+  for (var i in all_lists) {
+    if (list.id === all_lists[i].id) {
+      deleteIndex = i;
+    }
+  }
+  if (deleteIndex !== null) {
+    all_lists.splice(deleteIndex, 1);
+    saveLists();
+    updateAllListsTable();
+    updateActiveList(null);
+  }
+}
+
 function updateActiveList(list) {
-  activListID = list.id;
   var activListTable = document.getElementById('activListTable');
   activListTable.innerHTML = "";
-  var firstRow = activListTable.insertRow(-1);
-  var listNameCell = firstRow.insertCell();
-  var newEntryTextInputCell = firstRow.insertCell();
-  newEntryTextInputCell.appendChild(createEntryTextInput(list.id));
-  var newEntryButtonCell = firstRow.insertCell();
-  newEntryButtonCell.appendChild(createEntryButton(list.id));
+  if(list !== null) {
+    var menueRow = activListTable.insertRow(-1);
+    fillMenueRow(list, menueRow);
 
-  //Show entries
-  for (var i in list.entries) {
-    var entry = list.entries[i];
-    var row = allListsTable.insertRow(-1);
-    var cell = row.insertCell(0);
+    //create entries
+    for (var i in list.entries) {
+      var entry = list.entries[i];
+      console.log("debug " + entry.id)
+      var row = activListTable.insertRow(i);
+      var cell = row.insertCell();
+      cell.appendChild(document.createTextNode(entry.value));
+    }
   }
+}
+
+function fillMenueRow(list, menueRow) {
+  var listNameCell = menueRow.insertCell();
+  listNameCell.appendChild(document.createTextNode(list.name));
+  var newEntryTextInputCell = menueRow.insertCell();
+  newEntryTextInputCell.appendChild(createEntryTextInput(list.id));
+  var newEntryButtonCell = menueRow.insertCell();
+  newEntryButtonCell.appendChild(createEntryButton(list.id));
+  //TODO: Rename list and delete list
 }
 
 function createEntryTextInput(listID) {
   var chooseListButton = document.createElement('input');
-  chooseListButton.id = listID;
+  chooseListButton.id = listID+"textEntry";
   chooseListButton.type = "text";
   return chooseListButton;
 }
@@ -134,7 +165,15 @@ function createEntryButton(listID) {
 
 function clickNewEntry() {
   var list = getListForID(this.id);
-  console.log("New entry for: " +  list.name);
+  var textValue = document.getElementById(this.id+"textEntry").value;
+  console.log("New entry for: " +  list.name+" : " + textValue);
+  var newEntry = {
+    value:textValue,
+    id: textValue+getMilliseconds()
+  };
+  list.entries.push(newEntry);
+  saveLists();
+  updateActiveList(list);
 }
 
 function getListForID(id) {
