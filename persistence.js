@@ -143,29 +143,68 @@ function createEntries(list) {
     }
     var checkEntryCell = row.insertCell();
     checkEntryCell.appendChild(createCheckEntryButton(entry));
+    createEntryCell(checkEntryCell, entry);
+
     var valueCell = row.insertCell();
     valueCell.appendChild(document.createTextNode(entry.value));
+    createEntryCell(valueCell, entry);
+
+    var inputCell = row.insertCell();
+    inputCell.appendChild(createInputEntry(inputCell, entry));
+
+    var updateCell = row.insertCell();
+    updateCell.appendChild(createUpdateEntryButton(entry));
+
     var deleteCell = row.insertCell();
     deleteCell.appendChild(createDeleteEntryButton(entry.id));
   }
 }
 
+function createEntryCell(cell, entry) {
+  cell.id = entry.id;
+  cell.addEventListener ('click', clickCheckEntryButton, true);
+}
+
 function createCheckEntryButton(entry) {
   var checkEntryButton = document.createElement('input');
-  checkEntryButton.addEventListener ('click', clickCheckEntryButton, true);
-  checkEntryButton.id = entry.id;
   checkEntryButton.type = "checkbox";
   checkEntryButton.checked = entry.checked;
   return checkEntryButton;
 }
 
+function createInputEntry(cell, entry) {
+  var createInputEntry = document.createElement('input');
+  createInputEntry.id = entry.id+"input";
+  if(entry.hidden) {
+    cell.className = "hidden";
+    cell.addEventListener ('click', clickCheckEntryButton, true);
+  } else {
+    createInputEntry.type = "text";
+    createInputEntry.value = entry.value;
+  }
+  return createInputEntry;
+}
+
+function createUpdateEntryButton(entry) {
+  var createInputEntryButton = document.createElement('input');
+  createInputEntryButton.addEventListener ('click', clickUpdateEntryButton, true);
+  createInputEntryButton.id = entry.id;
+  createInputEntryButton.type = "button";
+  if(entry.hidden) {
+    createInputEntryButton.value = "Update";
+  } else {
+    createInputEntryButton.value = "Ok";
+  }
+  return createInputEntryButton;
+}
+
 function createDeleteEntryButton(entryID) {
-  var delteteEntryButton = document.createElement('input');
-  delteteEntryButton.addEventListener ('click', clickDeleteEntryButton, true);
-  delteteEntryButton.id = entryID;
-  delteteEntryButton.type = "button";
-  delteteEntryButton.value = "X";
-  return delteteEntryButton;
+  var deleteEntryButton = document.createElement('input');
+  deleteEntryButton.addEventListener ('click', clickDeleteEntryButton, true);
+  deleteEntryButton.id = entryID;
+  deleteEntryButton.type = "button";
+  deleteEntryButton.value = "X";
+  return deleteEntryButton;
 }
 
 function clickCheckEntryButton() {
@@ -176,6 +215,19 @@ function clickCheckEntryButton() {
     entry.checked = false;
   } else {
     entry.checked = true;
+  }
+  updateAll(getListForID(entry.listID));
+}
+
+function clickUpdateEntryButton() {
+  var entryID = this.id;
+  var entry = getEntryForID(entryID);
+  if(entry.hidden) {
+    entry.hidden = false;
+  } else {
+    entry.hidden = true;
+    var inputValue = document.getElementById(this.id+"input").value;
+    entry.value = inputValue;
   }
   updateAll(getListForID(entry.listID));
 }
@@ -228,7 +280,8 @@ function clickNewEntry() {
     id: textValue+getMilliseconds(),
     listID: list.id,
     checked: false,
-    color: null
+    color: null,
+    hidden: true
     };
   list.entries.push(newEntry);
   updateAll(list);
