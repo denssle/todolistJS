@@ -186,7 +186,7 @@ function createEntryButton(listID) {
   chooseListButton.addEventListener ('click', clickNewEntry, true);
   chooseListButton.id = listID;
   chooseListButton.type = "button";
-  chooseListButton.value = "Erstellen";
+  chooseListButton.value = "New entry";
   return chooseListButton;
 }
 
