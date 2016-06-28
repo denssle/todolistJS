@@ -128,18 +128,35 @@ function updateActiveList(list) {
   if(list !== null) {
     var menueRow = activListTable.insertRow();
     fillMenueRow(list, menueRow);
-
-    //create entries
-    for (var i in list.entries) {
-      var entry = list.entries[i];
-      console.log("debug " + entry.id)
-      var row = activListTable.insertRow(i);
-      var deleteCell = row.insertCell();
-      deleteCell.appendChild(createDeleteEntryButton(entry.id));
-      var valueCell = row.insertCell();
-      valueCell.appendChild(document.createTextNode(entry.value));
-    }
+    createEntries(list);
   }
+}
+
+function createEntries(list) {
+  for (var i in list.entries) {
+    var entry = list.entries[i];
+    var row = activListTable.insertRow(i);
+    if(entry.checked) {
+      row.className = entry.checked;
+    } else {
+      row.className = entry.color;
+    }
+    var checkEntryCell = row.insertCell();
+    checkEntryCell.appendChild(createCheckEntryButton(entry));
+    var valueCell = row.insertCell();
+    valueCell.appendChild(document.createTextNode(entry.value));
+    var deleteCell = row.insertCell();
+    deleteCell.appendChild(createDeleteEntryButton(entry.id));
+  }
+}
+
+function createCheckEntryButton(entry) {
+  var checkEntryButton = document.createElement('input');
+  checkEntryButton.addEventListener ('click', clickCheckEntryButton, true);
+  checkEntryButton.id = entry.id;
+  checkEntryButton.type = "checkbox";
+  checkEntryButton.checked = entry.checked;
+  return checkEntryButton;
 }
 
 function createDeleteEntryButton(entryID) {
@@ -149,6 +166,18 @@ function createDeleteEntryButton(entryID) {
   delteteEntryButton.type = "button";
   delteteEntryButton.value = "X";
   return delteteEntryButton;
+}
+
+function clickCheckEntryButton() {
+  var entryID = this.id;
+  var entry = getEntryForID(entryID);
+  console.log("Ready to check Entry: " + entry.id);
+  if(entry.checked) {
+    entry.checked = false;
+  } else {
+    entry.checked = true;
+  }
+  updateAll(getListForID(entry.listID));
 }
 
 function clickDeleteEntryButton() {
@@ -197,7 +226,9 @@ function clickNewEntry() {
   var newEntry = {
     value:textValue,
     id: textValue+getMilliseconds(),
-    listID: list.id
+    listID: list.id,
+    checked: false,
+    color: null
     };
   list.entries.push(newEntry);
   updateAll(list);
@@ -221,4 +252,5 @@ function getEntryForID(id) {
       }
     }
   }
+  return null;
 }

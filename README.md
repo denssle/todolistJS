@@ -1,3 +1,7 @@
+Todo:
+- Send text with 'enter'
+
+
 reactJS
 http://reactjs.de/posts/react-tutorial
 http://reactjs.net/getting-started/tutorial.html
