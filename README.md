@@ -3,13 +3,14 @@ Todo:
 -- Colored
 -- Deadline
 -- Standard
+
 - reactJS einbauen
+-- Layout & Design
 - AngularJS einbauen
 
 reactJS
 http://reactjs.de/posts/react-tutorial
 http://reactjs.net/getting-started/tutorial.html
-https://github.com/reactjs/react-tutorial/tree/master/public
 
 AngularJS
 https://angularjs.de/artikel/angularjs-tutorial-deutsch
