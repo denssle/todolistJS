@@ -3,7 +3,13 @@ var ListClass = React.createClass({
     return {
       inputValue: "",
       all_lists: this.loadLists(),
-      selectedList: ""
+      selectedList: {id: this.getMilliseconds()+"helloWorld",
+        name: "List",
+        type: "Standard",
+        entries: [
+          {id:"1", value:"X"},
+          {id:"2", value:"Y"}
+        ]}
       };
   },
 
@@ -31,11 +37,13 @@ var ListClass = React.createClass({
           <table>
           {
             this.state.all_lists.map(function(list) {
-              return <ListItem list={list} clickSelect={this.clickSelect} clickDelete={this.clickDelete}/>
+              return <ListItem list={list} clickSelect={this.clickSelect} clickDelete={this.clickDelete} key={list.id}/>
             }.bind(this))
           }
           </table>
-          <Entries list={this.state.selectedList}/>
+          <hr></hr>
+          <ListEntries list={this.state.selectedList}/>
+          <EntriesButtons list={this.state.selectedList}/>
       </div>
     );
   },
@@ -64,7 +72,7 @@ var ListClass = React.createClass({
     var newList = {id: this.getMilliseconds()+listName+listType,
       name: listName,
       type: listType,
-      entries: {}};
+      entries: []};
     var allLists = this.state.all_lists;
     allLists.push(newList);
     this.setState({all_lists: allLists});
@@ -114,22 +122,63 @@ var ListItem = React.createClass({
   render: function() {
     var list = this.props.list;
     return(
+      <tbody>
       <tr>
         <th>{list.name}</th>
         <td>{list.type}</td>
         <td><input type="button" value="Select" onClick={this.props.clickSelect} id={list.id}></input></td>
         <td><input type="button" value="Delete" onClick={this.props.clickDelete} id={list.id}></input></td>
-    </tr>)
+      </tr>
+      </tbody>)
   }
 });
 
-var Entries = React.createClass({
+var ListEntries = React.createClass({
+  render: function() {
+    var selectedList = this.props.list;
+    return(
+      <table>
+        <thead>
+        <tr>
+          <th>{selectedList.name}</th>
+          <td>{selectedList.type}</td>
+        </tr>
+      </thead>
+      <tbody>
+          {
+            selectedList.entries.map(function(entry) {
+              return <EntryItem entry={entry} key={entry.id} />
+            }.bind(this))
+          }
+      </tbody>
+    </table>
+    );
+  }
+});
+
+var EntryItem = React.createClass({
+  render: function() {
+    var entry = this.props.entry;
+    return(
+      <tr>
+      <td>{entry.value}</td>
+      </tr>
+    );
+  }
+});
+
+var EntriesButtons = React.createClass({
   render: function() {
     var list = this.props.list;
-    return (
-      <div className="entriesdiv">
-        {list.name}
-      </div>
+    return(
+      <table>
+        <tbody>
+        <tr>
+          <td><input type="text"></input></td>
+          <td><input type="button" value="New Entry"></input></td>
+        </tr>
+      </tbody>
+      </table>
     );
   }
 });
