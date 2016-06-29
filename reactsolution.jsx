@@ -1,7 +1,14 @@
+var ListItemWrapper = React.createClass({
+  render: function() {
+    return <li>{this.props.data.name}</li>;
+  }
+});
+
 var Lists = React.createClass({
   getInitialState: function() {
     return {
-      inputValue: ""
+      inputValue: "",
+      all_lists: this.loadLists()
       };
   },
 
@@ -9,6 +16,8 @@ var Lists = React.createClass({
     return (
       <div className="listdiv">
         {this.createNewListInput()}
+        <hr></hr>
+        {this.showLists()}
       </div>
     );
   },
@@ -30,13 +39,61 @@ var Lists = React.createClass({
         </select>
       <input type="button" id="createNewListButton" value="Create new list" onClick={this.clickNewList}></input>
       </label>
-      </form>;
+    </form>;
+    },
+
+  showLists: function() {
+    return <ul>
+        {this.state.all_lists.map(function(result) {
+           return <ListItemWrapper key={result.id} data={result}/>;
+        })}
+      </ul>;
   },
 
   clickNewList: function() {
     var listName = this.state.inputValue;
     var listType = this.refs.typeOption.value;
-    console.log(listName + " : " + listType);
+    var newList = {id: this.getMilliseconds()+listName+listType, name: listName, type: listType, entries: {}};
+    var allLists = this.state.all_lists;
+    allLists.push(newList);
+    console.log(newList.name + " : " + newList.type);
+    console.log(allLists);
+    this.saveLists();
+  },
+
+  saveLists: function() {
+    localStorage.setItem("react_2do_key", JSON.stringify(this.state.all_lists));
+  },
+
+  loadLists: function() {
+    var data = [];
+    var string = localStorage.getItem("react_2do_key");
+    if (string !== null) {
+      data = JSON.parse(string);
+    } else {
+      console.log("No local Storage found. ")
+    }
+    return data;
+  },
+  getMilliseconds: function() {
+    return new Date().getTime();
+  }
+});
+
+var CommentList = React.createClass({
+  render: function() {
+    var commentNodes = this.props.data.map(function(comment) {
+      return (
+        <Comment author={comment.author} key={comment.id}>
+          {comment.text}
+        </Comment>
+      );
+    });
+    return (
+      <div className="commentList">
+        {commentNodes}
+      </div>
+    );
   }
 });
 
@@ -53,7 +110,7 @@ var Entries = React.createClass({
 var App = React.createClass({
   render: function() {
     return (
-      <div className="commentBox">
+      <div className="todolist">
         <Lists />
         <hr></hr>
         <Entries />
