@@ -2,7 +2,8 @@ var ListClass = React.createClass({
   getInitialState: function() {
     return {
       inputValue: "",
-      all_lists: this.loadLists()
+      all_lists: this.loadLists(),
+      selectedList: ""
       };
   },
 
@@ -22,6 +23,7 @@ var ListClass = React.createClass({
   },
 
   render: function() {
+    this.saveLists();
     return (
       <div className="listdiv">
         {this.createNewListInput()}
@@ -29,10 +31,11 @@ var ListClass = React.createClass({
           <table>
           {
             this.state.all_lists.map(function(list) {
-              return <ListItem list={list} />
+              return <ListItem list={list} clickSelect={this.clickSelect} clickDelete={this.clickDelete}/>
             }.bind(this))
           }
           </table>
+          <Entries list={this.state.selectedList}/>
       </div>
     );
   },
@@ -46,30 +49,64 @@ var ListClass = React.createClass({
           <option value="deadline">Deadline</option>
           <option value="colored">Colored</option>
         </select>
-      <input type="button" id="createNewListButton" value="Create new list" onClick={this.clickNewList}></input>
+      <input type="submit" id="createNewListButton" value="Create new list" onClick={this.clickNewList}></input>
       </label>
     </form>;
     },
 
   handleInputChange: function(evt) {
-    this.setState({
-      inputValue: evt.target.value
-    });
+    this.setState({inputValue: evt.target.value});
   },
 
   clickNewList: function() {
     var listName = this.state.inputValue;
     var listType = this.refs.typeOption.value;
-    var newList = {id: this.getMilliseconds()+listName+listType, name: listName, type: listType, entries: {}};
+    var newList = {id: this.getMilliseconds()+listName+listType,
+      name: listName,
+      type: listType,
+      entries: {}};
     var allLists = this.state.all_lists;
     allLists.push(newList);
-    console.log(newList.name + " : " + newList.type);
-    console.log(allLists);
+    this.setState({all_lists: allLists});
     this.saveLists();
   },
 
   getMilliseconds: function() {
     return new Date().getTime();
+  },
+
+  clickSelect: function(evt) {
+    var id = evt.target.id;
+    var list = this.getListForID(id)
+    this.setState({selectedList: list});
+  },
+
+  clickDelete: function(evt) {
+    var id = evt.target.id;
+    var list = this.getListForID(id)
+    var deleteIndex = null;
+    var allLists = this.state.all_lists;
+
+    for (var i in allLists) {
+      if (list.id === allLists[i].id) {
+        deleteIndex = i;
+      }
+    }
+    if (deleteIndex !== null) {
+      allLists.splice(deleteIndex, 1);
+    }
+    this.setState({all_lists: allLists});
+    this.saveLists();
+  },
+
+  getListForID: function(id) {
+    var lists = this.state.all_lists;
+    for (var i in lists) {
+      if (id === lists[i].id) {
+        return lists[i];
+      }
+    }
+    return null;
   }
 });
 
@@ -80,41 +117,24 @@ var ListItem = React.createClass({
       <tr>
         <th>{list.name}</th>
         <td>{list.type}</td>
-        <td><input type="button" value="Select" onClick={this.clickSelect}></input></td>
-        <td><input type="button" value="Delete"onClick={this.clickDelete} ></input></td>
+        <td><input type="button" value="Select" onClick={this.props.clickSelect} id={list.id}></input></td>
+        <td><input type="button" value="Delete" onClick={this.props.clickDelete} id={list.id}></input></td>
     </tr>)
-  },
-  clickSelect: function() {
-    console.log(this.props.list.id);
-  },
-  clickDelete: function() {
-    console.log(this.props.list.id);
   }
 });
 
 var Entries = React.createClass({
   render: function() {
+    var list = this.props.list;
     return (
       <div className="entriesdiv">
-        Entries here
-      </div>
-    );
-  }
-});
-
-var App = React.createClass({
-  render: function() {
-    return (
-      <div className="todolist">
-        <ListClass />
-        <hr></hr>
-        <Entries />
+        {list.name}
       </div>
     );
   }
 });
 
 ReactDOM.render(
-  <App />,
+  <ListClass />,
   document.getElementById('content')
 );
