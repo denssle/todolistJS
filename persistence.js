@@ -149,8 +149,10 @@ function createEntries(list) {
     valueCell.appendChild(document.createTextNode(entry.value));
     createEntryCell(valueCell, entry);
 
-    var inputCell = row.insertCell();
-    inputCell.appendChild(createInputEntry(inputCell, entry));
+    if(!entry.hidden) {
+      var inputCell = row.insertCell();
+      inputCell.appendChild(createInputEntry(inputCell, entry));
+    }
 
     var updateCell = row.insertCell();
     updateCell.appendChild(createUpdateEntryButton(entry));
@@ -189,7 +191,7 @@ function createUpdateEntryButton(entry) {
   var createInputEntryButton = document.createElement('input');
   createInputEntryButton.addEventListener ('click', clickUpdateEntryButton, true);
   createInputEntryButton.id = entry.id;
-  createInputEntryButton.type = "button";
+  createInputEntryButton.type = "submit";
   if(entry.hidden) {
     createInputEntryButton.value = "Update";
   } else {
@@ -266,7 +268,7 @@ function createEntryButton(listID) {
   var chooseListButton = document.createElement('input');
   chooseListButton.addEventListener ('click', clickNewEntry, true);
   chooseListButton.id = listID;
-  chooseListButton.type = "button";
+  chooseListButton.type = "submit";
   chooseListButton.value = "New entry";
   return chooseListButton;
 }
