@@ -64,6 +64,9 @@ function getSavedLists() {
 }
 
 function updateAllListsTable() {
+  /**
+  * Create a table filled with all 2Do lists and theire buttons. 
+  */
   all_lists = getSavedLists();
   var allListsTable = document.getElementById('allListsTable');
   allListsTable.innerHTML = "";
@@ -102,12 +105,18 @@ function createDeleteListButton(listID) {
 }
 
 function clickChooseListButton() {
+  /**
+  * Handels the "select" Button and changes the active list.
+  */
   var list = getListForID(this.id);
   console.log("Found: "+list.name);
   updateActiveList(list);
 }
 
 function clickDeleteListButton() {
+  /**
+  * Deletes the list
+  */
   var list = getListForID(this.id);
   console.log("Ready to delete: "+list.name);
   var deleteIndex = null;
@@ -123,6 +132,9 @@ function clickDeleteListButton() {
 }
 
 function updateActiveList(list) {
+  /**
+  * Changes the "activ", this means the selected, list to the parameterd list.
+  */
   var activListTable = document.getElementById('activListTable');
   activListTable.innerHTML = "";
   if(list !== null) {
@@ -133,6 +145,10 @@ function updateActiveList(list) {
 }
 
 function createEntries(list) {
+  /**
+  * Creates rows for the entries of a selected 2DO list
+  *
+  */
   for (var i in list.entries) {
     var entry = list.entries[i];
     var row = activListTable.insertRow(i);
@@ -177,10 +193,7 @@ function createCheckEntryButton(entry) {
 function createInputEntry(cell, entry) {
   var createInputEntry = document.createElement('input');
   createInputEntry.id = entry.id+"input";
-  if(entry.hidden) {
-    cell.className = "hidden";
-    cell.addEventListener ('click', clickCheckEntryButton, true);
-  } else {
+  if(!entry.hidden) {
     createInputEntry.type = "text";
     createInputEntry.value = entry.value;
   }
@@ -188,6 +201,9 @@ function createInputEntry(cell, entry) {
 }
 
 function createUpdateEntryButton(entry) {
+  /**
+  * If the update input text field is visible the button get another text.
+  */
   var createInputEntryButton = document.createElement('input');
   createInputEntryButton.addEventListener ('click', clickUpdateEntryButton, true);
   createInputEntryButton.id = entry.id;
@@ -210,6 +226,9 @@ function createDeleteEntryButton(entryID) {
 }
 
 function clickCheckEntryButton() {
+  /**
+  * Toggels the "Check" Attribut of an entry between true and false
+  */
   var entryID = this.id;
   var entry = getEntryForID(entryID);
   console.log("Ready to check Entry: " + entry.id);
@@ -222,6 +241,10 @@ function clickCheckEntryButton() {
 }
 
 function clickUpdateEntryButton() {
+  /**
+  * If the entry wasen´t clickt befor this will make the input field visible
+  * Else: Inputfield was visible, we change the value of a entry.
+  */
   var entryID = this.id;
   var entry = getEntryForID(entryID);
   if(entry.hidden) {
@@ -235,6 +258,10 @@ function clickUpdateEntryButton() {
 }
 
 function clickDeleteEntryButton() {
+  /**
+  * Eventhandling for the delete Entry Button ("X").
+  * Updates all when finished
+  */
   var entryID = this.id;
   var entry = getEntryForID(entryID);
   var list = getListForID(entry.listID)
@@ -248,6 +275,9 @@ function clickDeleteEntryButton() {
 }
 
 function fillMenueRow(list, menueRow) {
+  /**
+  * Creates a Row in the table with net new Entry Button and Text Input.
+  */
   var listNameCell = menueRow.insertCell();
   listNameCell.appendChild(document.createTextNode(list.name));
   var newEntryTextInputCell = menueRow.insertCell();
@@ -274,6 +304,9 @@ function createEntryButton(listID) {
 }
 
 function clickNewEntry() {
+  /**
+  * Eventhandling for the new Entry Button.
+  */
   var list = getListForID(this.id);
   var textValue = document.getElementById(this.id+"textEntry").value;
   console.log("New entry for: " +  list.name+" : " + textValue);
