@@ -1,6 +1,10 @@
 Todo:
-- Send text with 'enter'
-
+- Listen Typen geben
+-- Colored
+-- Deadline
+-- Standard
+- reactJS einbauen
+- AngularJS einbauen
 
 reactJS
 http://reactjs.de/posts/react-tutorial

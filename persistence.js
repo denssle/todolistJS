@@ -30,8 +30,8 @@ function clickNewList() {
   */
     var newListName  = document.getElementById('newListName').value;
     var list = {
-        name:   newListName,
-        id:  newListName+getMilliseconds(),
+        name: newListName,
+        id: newListName+getMilliseconds(),
         entries: new Array
     };
     console.log("Create: " + list.id + " Name: " + list.name);
@@ -93,12 +93,12 @@ function createChooseListButton(listID) {
 }
 
 function createDeleteListButton(listID) {
-  var delteteListeButton = document.createElement('input');
-  delteteListeButton.addEventListener ('click', clickDeleteListButton, true);
-  delteteListeButton.id = listID;
-  delteteListeButton.type = "button";
-  delteteListeButton.value = "Delete";
-  return delteteListeButton;
+  var deleteListeButton = document.createElement('input');
+  deleteListeButton.addEventListener ('click', clickDeleteListButton, true);
+  deleteListeButton.id = listID;
+  deleteListeButton.type = "button";
+  deleteListeButton.value = "Delete";
+  return deleteListeButton;
 }
 
 function clickChooseListButton() {
@@ -281,7 +281,7 @@ function clickUpdateEntryButton() {
 function clickDeleteEntryButton() {
   /**
   * Eventhandling for the delete Entry Button ("X").
-  * Updates all when finished
+  * Updates 2do list table and entries table when finished
   */
   var entryID = this.id;
   var entry = getEntryForID(entryID);
@@ -305,10 +305,12 @@ function fillMenueRow(list, menueRow) {
   newEntryTextInputCell.appendChild(createEntryTextInput(list.id));
   var newEntryButtonCell = menueRow.insertCell();
   newEntryButtonCell.appendChild(createEntryButton(list.id));
-  //TODO: Rename list and delete list
 }
 
 function createEntryTextInput(listID) {
+  /**
+  * Creates the input field for a new list entry.
+  */
   var chooseListButton = document.createElement('input');
   chooseListButton.id = listID+"textEntry";
   chooseListButton.type = "text";
@@ -316,6 +318,9 @@ function createEntryTextInput(listID) {
 }
 
 function createEntryButton(listID) {
+  /**
+  * Creates the "New enty button".
+  */
   var chooseListButton = document.createElement('input');
   chooseListButton.addEventListener ('click', clickNewEntry, true);
   chooseListButton.id = listID;
