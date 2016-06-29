@@ -29,15 +29,12 @@ function clickNewList() {
   * creates a new list object and saves it in the localStorage.
   */
     var newListName  = document.getElementById('newListName').value;
-    var typ = document.getElementById('newListTyp');
-    var selectedTyp = typ.options[typ.selectedIndex].value;
     var list = {
         name:   newListName,
-        typ:   selectedTyp,
-        id:  selectedTyp+newListName+getMilliseconds(),
+        id:  newListName+getMilliseconds(),
         entries: new Array
     };
-    console.log("Create: " + list.id + " Name: " + list.name + " Typ:" + list.typ);
+    console.log("Create: " + list.id + " Name: " + list.name);
     all_lists.push(list);
     updateAll(null);
 }
@@ -65,7 +62,7 @@ function getSavedLists() {
 
 function updateAllListsTable() {
   /**
-  * Create a table filled with all 2Do lists and theire buttons. 
+  * Create a table filled with all 2Do lists and theire buttons.
   */
   all_lists = getSavedLists();
   var allListsTable = document.getElementById('allListsTable');
@@ -170,6 +167,9 @@ function createEntries(list) {
       inputCell.appendChild(createInputEntry(inputCell, entry));
     }
 
+    var deadlineCell = row.insertCell();
+    deadlineCell.appendChild(createDeadlineEntry(entry));
+
     var updateCell = row.insertCell();
     updateCell.appendChild(createUpdateEntryButton(entry));
 
@@ -191,6 +191,9 @@ function createCheckEntryButton(entry) {
 }
 
 function createInputEntry(cell, entry) {
+  /**
+  * If enty hidden show nothing
+  */
   var createInputEntry = document.createElement('input');
   createInputEntry.id = entry.id+"input";
   if(!entry.hidden) {
@@ -198,6 +201,22 @@ function createInputEntry(cell, entry) {
     createInputEntry.value = entry.value;
   }
   return createInputEntry;
+}
+
+function createDeadlineEntry(entry) {
+  /**
+  * If entry is hidden show value else make deadline updatable
+  */
+  var createDeadlineEntry;
+  if(entry.hidden) {
+    createDeadlineEntry = document.createTextNode(" " + entry.deadline + " ");
+  } else {
+    createDeadlineEntry = document.createElement('input');
+    createDeadlineEntry.id = entry.id+"deadline";
+    createDeadlineEntry.type = "date";
+    createDeadlineEntry.value = entry.value;
+  }
+  return createDeadlineEntry;
 }
 
 function createUpdateEntryButton(entry) {
@@ -251,8 +270,10 @@ function clickUpdateEntryButton() {
     entry.hidden = false;
   } else {
     entry.hidden = true;
-    var inputValue = document.getElementById(this.id+"input").value;
-    entry.value = inputValue;
+    var inputText = document.getElementById(this.id+"input").value;
+    var inputDeatline = document.getElementById(this.id+"deadline").value;
+    entry.value = inputText;
+    entry.deadline = inputDeatline;
   }
   updateAll(getListForID(entry.listID));
 }
@@ -316,6 +337,7 @@ function clickNewEntry() {
     listID: list.id,
     checked: false,
     color: null,
+    deadline: "-",
     hidden: true
     };
   list.entries.push(newEntry);
