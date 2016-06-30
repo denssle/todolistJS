@@ -9,19 +9,19 @@ var ListClass = React.createClass({
         type: "standard",
         entries: [
           {id:this.getMilliseconds()+"X",
-            name:"Datepicker für Deadline",
-            checked:false,
+            name:"Probeaufgabe ausgegeben",
+            checked:true,
             deadline: "-",
             hidden: true,
             color: "Black "},
           {id:this.getMilliseconds()+"Y",
-            name:"CSS einbauen",
+            name:"Probeaufgabe kontrolliert",
             checked:false,
             deadline: "-",
             hidden: true,
             color: "Black "},
           {id:this.getMilliseconds()+"Z",
-            name:"Kommentare einbauen",
+            name:"Dominik eingestellt",
             checked:false,
             deadline: "-",
             hidden: true,
@@ -442,7 +442,7 @@ var EntryDeleteButton = React.createClass({
 
 var EntriesButtons = React.createClass({
   /*
-  * The last line, here are the input fields to create new entries. 
+  * The last line, here are the input fields to create new entries.
   */
   render: function() {
     var list = this.props.list;
