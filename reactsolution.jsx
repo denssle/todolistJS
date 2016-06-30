@@ -3,6 +3,7 @@ var ListClass = React.createClass({
     return {
       inputValue: "",
       all_lists: this.loadLists(),
+      changedEntries: {},
       selectedList: {id: this.getMilliseconds()+"helloWorld",
         name: "List",
         type: "standard",
@@ -53,12 +54,16 @@ var ListClass = React.createClass({
           <table>
           {
             this.state.all_lists.map(function(list) {
-              return <ListItem list={list} clickSelect={this.clickSelect} clickDelete={this.clickDelete} key={list.id}/>
+              return <ListItem list={list} clickSelectListe={this.clickSelectListe} clickDeleteListe={this.clickDeleteListe} key={list.id}/>
             }.bind(this))
           }
           </table>
           <hr></hr>
-          <ListEntries list={this.state.selectedList} clickUpdateEntry={this.clickUpdateEntry} />
+          <ListEntries
+            list={this.state.selectedList}
+            clickUpdateEntry={this.clickUpdateEntry}
+            clickDeleteEntry={this.clickDeleteEntry}
+            handleEntryChange={this.handleEntryChange}/>
           <EntriesButtons list={this.state.selectedList} clickNewEntry={this.clickNewEntry} />
       </div>
     );
@@ -82,6 +87,14 @@ var ListClass = React.createClass({
     this.setState({inputValue: evt.target.value});
   },
 
+  handleEntryChange: function(evt) {
+    var id = evt.target.id;
+    var value = evt.target.value;
+    var entriesMap = this.state.changedEntries;
+    entriesMap[id] = value;
+    this.setState({changedEntries: entriesMap});
+  },
+
   clickNewList: function() {
     var listName = this.state.inputValue;
     var listType = this.refs.typeOption.value;
@@ -100,13 +113,13 @@ var ListClass = React.createClass({
     return new Date().getTime();
   },
 
-  clickSelect: function(evt) {
+  clickSelectListe: function(evt) {
     var id = evt.target.id;
     var list = this.getListForID(id)
     this.setState({selectedList: list});
   },
 
-  clickDelete: function(evt) {
+  clickDeleteListe: function(evt) {
     var id = evt.target.id;
     var list = this.getListForID(id)
     var deleteIndex = null;
@@ -142,7 +155,6 @@ var ListClass = React.createClass({
 
   clickUpdateEntry: function(evt) {
     var id = evt.target.id;
-    console.log("Found: " + id);
     var list = this.state.selectedList;
     var type = list.type;
     var entry;
@@ -153,13 +165,33 @@ var ListClass = React.createClass({
         index = i;
       }
     }
-    console.log(entry.value);
     if(entry.hidden) {
       entry.hidden = false;
     } else {
+      var entriesMap = this.state.changedEntries;
+      var value = entriesMap[id];
+      entry.value = value;
       entry.hidden = true;
     }
     list.entries[index] = entry;
+    this.setState({selectedList: list});
+  },
+
+  clickDeleteEntry: function(evt) {
+    var id = evt.target.id;
+    var list = this.state.selectedList;
+    var entriesList = list.entries;
+    var deleteIndex = null;
+    console.log(id);
+    for (var i in entriesList) {
+      if (id === entriesList[i].id) {
+        deleteIndex = i;
+      }
+    }
+    if (deleteIndex !== null) {
+      entriesList.splice(deleteIndex, 1);
+    }
+    list.entries = entriesList;
     this.setState({selectedList: list});
   },
 
@@ -192,8 +224,8 @@ var ListItem = React.createClass({
       <tr>
         <th>{list.name}</th>
         <td>{list.type}</td>
-        <td><input type="button" value="Select" onClick={this.props.clickSelect} id={list.id}></input></td>
-        <td><input type="button" value="Delete" onClick={this.props.clickDelete} id={list.id}></input></td>
+        <td><input type="button" value="Select" onClick={this.props.clickSelectListe} id={list.id}></input></td>
+        <td><input type="button" value="Delete" onClick={this.props.clickDeleteListe} id={list.id}></input></td>
       </tr>
       </tbody>)
   }
@@ -217,7 +249,9 @@ var ListEntries = React.createClass({
                 entry={entry}
                 key={entry.id}
                 clickUpdateEntry={this.props.clickUpdateEntry}
-                type = {selectedList.type} />
+                clickDeleteEntry={this.props.clickDeleteEntry}
+                type = {selectedList.type}
+                handleEntryChange={this.props.handleEntryChange}/>
             }.bind(this))
           }
       </tbody>
@@ -227,18 +261,27 @@ var ListEntries = React.createClass({
 });
 
 var EntryItem = React.createClass({
-  // colored deadline
   render: function() {
     var entry = this.props.entry;
     var type = this.props.type;
     if(type === "standard"){
-      return (<StandardEntry entry={entry}  key={entry.id} clickUpdateEntry={this.props.clickUpdateEntry} />);
+      return (<StandardEntry entry={entry}
+        key={entry.id}
+        clickUpdateEntry={this.props.clickUpdateEntry}
+        clickDeleteEntry={this.props.clickDeleteEntry}
+        handleEntryChange={this.props.handleEntryChange}/>);
     }
     if(type === "colored") {
-      return (<ColoredItem entry={entry}  key={entry.id} clickUpdateEntry={this.props.clickUpdateEntry} />);
+      return (<ColoredItem entry={entry}
+        key={entry.id}
+        clickUpdateEntry={this.props.clickUpdateEntry}
+        clickDeleteEntry={this.props.clickDeleteEntry}/>);
     }
     if(type === "deadline") {
-      return (<DeadlineItem entry={entry}  key={entry.id} clickUpdateEntry={this.props.clickUpdateEntry} />);
+      return (<DeadlineItem entry={entry}
+        key={entry.id}
+        clickUpdateEntry={this.props.clickUpdateEntry}
+        clickDeleteEntry={this.props.clickDeleteEntry}/>);
     }
     return null;
   }
@@ -253,16 +296,16 @@ var StandardEntry = React.createClass({
           <td><input type="checkbox" defaultChecked={entry.checked}></input></td>
           <td>{entry.value}</td>
           <td><input type="button" value="Update" onClick={this.props.clickUpdateEntry} id={entry.id}></input></td>
-          <td><input type="button" value="X"></input></td>
+          <td><input type="button" value="X" onClick={this.props.clickDeleteEntry} id={entry.id}></input></td>
         </tr>
       );
     } else {
       return (
         <tr>
           <td><input type="checkbox" defaultChecked={entry.checked}></input></td>
-          <td>{entry.value}</td>
-          <td><input type="text"></input></td>
+          <td><input type="text" onChange={this.props.handleEntryChange} id={entry.id} defaultValue={entry.value}></input></td>
           <td><input type="button" value="Ok" onClick={this.props.clickUpdateEntry} id={entry.id}></input></td>
+          <td><input type="button" value="X" onClick={this.props.clickDeleteEntry} id={entry.id}></input></td>
         </tr>
       );
     }
@@ -277,6 +320,7 @@ var ColoredItem = React.createClass({
         <td>{entry.value}</td>
         <td>{entry.color}</td>
         <td><input type="button" value="Update" onClick={this.props.clickUpdateEntry} id={entry.id}></input></td>
+        <td><input type="button" value="X" onClick={this.props.clickDeleteEntry} id={entry.id}></input></td>
       </tr>
     );
   }
@@ -290,6 +334,7 @@ var DeadlineItem = React.createClass({
         <td>{entry.value}</td>
         <td>{entry.deadline}</td>
         <td><input type="button" value="Update" onClick={this.props.clickUpdateEntry} id={entry.id}></input></td>
+        <td><input type="button" value="X" onClick={this.props.clickDeleteEntry} id={entry.id}></input></td>
       </tr>
     );
   }
