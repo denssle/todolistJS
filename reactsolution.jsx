@@ -48,40 +48,48 @@ var ListClass = React.createClass({
   render: function() {
     this.saveLists();
     return (
-      <div className="listdiv">
+      <div className="innerbox">
+        <br />
         {this.createNewListInput()}
-        <hr></hr>
-          <table>
-          {
-            this.state.all_lists.map(function(list) {
-              return <ListItem list={list} clickSelectListe={this.clickSelectListe} clickDeleteListe={this.clickDeleteListe} key={list.id}/>
-            }.bind(this))
-          }
-          </table>
-          <hr></hr>
-          <ListEntries
-            list={this.state.selectedList}
-            clickUpdateEntry={this.clickUpdateEntry}
-            clickDeleteEntry={this.clickDeleteEntry}
-            clickCheckBox={this.clickCheckBox}
-            handleEntryChange={this.handleEntryChange}/>
-          <EntriesButtons list={this.state.selectedList} clickNewEntry={this.clickNewEntry} />
+        <br />
+        <hr />
+        <br />
+        <table>
+        {
+          this.state.all_lists.map(function(list) {
+            return <ListItem list={list} clickSelectListe={this.clickSelectListe} clickDeleteListe={this.clickDeleteListe} key={list.id}/>
+          }.bind(this))
+        }
+        </table>
+        <br />
+        <hr />
+        <br />
+        <ListEntries
+          list={this.state.selectedList}
+          clickUpdateEntry={this.clickUpdateEntry}
+          clickDeleteEntry={this.clickDeleteEntry}
+          clickCheckBox={this.clickCheckBox}
+          handleEntryChange={this.handleEntryChange}/>
+        <EntriesButtons list={this.state.selectedList} clickNewEntry={this.clickNewEntry} />
+        <br />
       </div>
     );
   },
 
   createNewListInput: function() {
-    return <form id="newListForm">
-      <label>New List:
-      <input type="text" value={this.state.value} onChange={this.handleInputChange}></input>
-        <select ref="typeOption">
-          <option value="standard">Standard</option>
-          <option value="deadline">Deadline</option>
-          <option value="colored">Colored</option>
-        </select>
-      <input type="submit" id="createNewListButton" value="Create new list" onClick={this.clickNewList}></input>
-      </label>
-    </form>;
+    return (
+      <form id="newListForm">
+        <label>New List:
+        <input type="text" value={this.state.value} onChange={this.handleInputChange}></input>
+          <select ref="typeOption">
+            <option value="standard">Standard</option>
+            <option value="deadline">Deadline</option>
+            <option value="colored">Colored</option>
+          </select>
+        <input type="submit" id="createNewListButton" value="Create new list" onClick={this.clickNewList}></input>
+        </label>
+      </form>
+    );
     },
 
   handleInputChange: function(evt) {

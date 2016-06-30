@@ -5,13 +5,13 @@ html, body {
     height: 100%;
     display: table;
 }
-.container {
+#content {
     display: table-cell;
     text-align: center;
     vertical-align: top;
 }
 
-.content {
+.innerbox {
     display: inline-block;
     text-align: left;
 }
