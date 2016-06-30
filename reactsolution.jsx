@@ -9,19 +9,19 @@ var ListClass = React.createClass({
         type: "standard",
         entries: [
           {id:this.getMilliseconds()+"X",
-            value:"X",
-            checked:true,
+            name:"Datepicker für Deadline",
+            checked:false,
             deadline: "-",
             hidden: true,
             color: "Black "},
           {id:this.getMilliseconds()+"Y",
-            value:"Y",
+            name:"CSS einbauen",
             checked:false,
             deadline: "-",
             hidden: true,
             color: "Black "},
           {id:this.getMilliseconds()+"Z",
-            value:"Z",
+            name:"Kommentare einbauen",
             checked:false,
             deadline: "-",
             hidden: true,
@@ -144,7 +144,7 @@ var ListClass = React.createClass({
     console.log("New entry: "+inputValue);
     var newEnty = {
       id:this.getMilliseconds()+"id"+inputValue,
-      value: inputValue,
+      name: inputValue,
       checked:false,
       hidden:true,
       deadline: "-",
@@ -164,14 +164,12 @@ var ListClass = React.createClass({
       entry.hidden = false;
     } else {
       var entriesMap = this.state.changedEntries;
-      var value = entriesMap[id];
-      if(type==="standard") {
-        entry.value = value;
-      } else if (type==="deadline") {
-        entry.deadline = value;
-      } else if (type==="colored") {
-        entry.color = value;
-      }
+      var valueInput = entriesMap[id+"name"];
+      var deadlineInput = entriesMap[id+"deadline"];
+      var colorInput = entriesMap[id+"color"];
+      entry.name = valueInput;
+      entry.deadline = deadlineInput;
+      entry.color = colorInput;
       entry.hidden = true;
     }
     list.entries[index] = entry;
@@ -287,6 +285,7 @@ var EntryItem = React.createClass({
         key={entry.id}
         clickUpdateEntry={this.props.clickUpdateEntry}
         clickDeleteEntry={this.props.clickDeleteEntry}
+        clickCheckBox={this.props.clickCheckBox}
         handleEntryChange={this.props.handleEntryChange}/>);
     }
     if(type === "deadline") {
@@ -294,6 +293,7 @@ var EntryItem = React.createClass({
         key={entry.id}
         clickUpdateEntry={this.props.clickUpdateEntry}
         clickDeleteEntry={this.props.clickDeleteEntry}
+        clickCheckBox={this.props.clickCheckBox}
         handleEntryChange={this.props.handleEntryChange}/>);
     }
     return null;
@@ -307,7 +307,7 @@ var StandardEntry = React.createClass({
       return(
         <tr>
           <td><input type="checkbox" defaultChecked={entry.checked} onClick={this.props.clickCheckBox} id={entry.id}></input></td>
-          <td>{entry.value}</td>
+          <td>{entry.name}</td>
           <EntryUpdateButton clickUpdateEntry={this.props.clickUpdateEntry} id={entry.id}/>
           <EntryDeleteButton clickDeleteEntry={this.props.clickDeleteEntry} id={entry.id}/>
         </tr>
@@ -316,7 +316,7 @@ var StandardEntry = React.createClass({
       return (
         <tr>
           <td><input type="checkbox" defaultChecked={entry.checked} onClick={this.props.clickCheckBox} id={entry.id}></input></td>
-          <td><input type="text" onChange={this.props.handleEntryChange} id={entry.id} defaultValue={entry.value}></input></td>
+          <td><input type="text" onChange={this.props.handleEntryChange} id={entry.id+"name"} defaultValue={entry.name}></input></td>
           <td><input type="button" value="Ok" onClick={this.props.clickUpdateEntry} id={entry.id}></input></td>
           <EntryDeleteButton clickDeleteEntry={this.props.clickDeleteEntry} id={entry.id}/>
         </tr>
@@ -332,16 +332,18 @@ var ColoredItem = React.createClass({
     if(entry.hidden) {
       return(
         <tr style={style}>
-          <td>{entry.value}</td>
+          <td><input type="checkbox" defaultChecked={entry.checked} onClick={this.props.clickCheckBox} id={entry.id}></input></td>
+          <td>{entry.name}</td>
           <EntryUpdateButton clickUpdateEntry={this.props.clickUpdateEntry} id={entry.id}/>
           <EntryDeleteButton clickDeleteEntry={this.props.clickDeleteEntry} id={entry.id}/>
         </tr>);
       } else {
         return(
           <tr style={style}>
-            <td>{entry.value}</td>
+            <td><input type="checkbox" defaultChecked={entry.checked} onClick={this.props.clickCheckBox} id={entry.id}></input></td>
+            <td><input type="text" onChange={this.props.handleEntryChange} id={entry.id+"name"} defaultValue={entry.name}></input></td>
              <td>
-              <select onChange={this.props.handleEntryChange} id={entry.id}>
+              <select onChange={this.props.handleEntryChange} id={entry.id+"color"}>
                 <option value="Black">Black</option>
                 <option value="Green">Green</option>
                 <option value="Blue">Blue</option>
@@ -357,13 +359,14 @@ var ColoredItem = React.createClass({
 });
 
 var DeadlineItem = React.createClass({
-  //selected={entry.deadline}
+  //name={entry.deadline}
   render: function() {
     var entry = this.props.entry;
     if(entry.hidden) {
       return(
         <tr>
-          <td>{entry.value}</td>
+          <td><input type="checkbox" defaultChecked={entry.checked} onClick={this.props.clickCheckBox} id={entry.id}></input></td>
+          <td>{entry.name}</td>
           <td>{entry.deadline}</td>
           <EntryUpdateButton clickUpdateEntry={this.props.clickUpdateEntry} id={entry.id}/>
           <EntryDeleteButton clickDeleteEntry={this.props.clickDeleteEntry} id={entry.id}/>
@@ -372,11 +375,12 @@ var DeadlineItem = React.createClass({
     } else {
       return (
         <tr>
-        <td>{entry.value}</td>
-        <td><input type="date" onChange={this.props.handleEntryChange} id={entry.id} ></input></td>
-        <td><input type="button" value="Ok" onClick={this.props.clickUpdateEntry} id={entry.id}></input></td>
-        <EntryDeleteButton onClick={this.props.clickDeleteEntry} id={entry.id}/>
-        </tr>
+          <td><input type="checkbox" defaultChecked={entry.checked} onClick={this.props.clickCheckBox} id={entry.id}></input></td>
+          <td><input type="text" onChange={this.props.handleEntryChange} id={entry.id+"name"} defaultValue={entry.name}></input></td>
+          <td><input type="date" onChange={this.props.handleEntryChange} id={entry.id+"deadline"} ng-model="string"></input></td>
+          <td><input type="button" value="Ok" onClick={this.props.clickUpdateEntry} id={entry.id}></input></td>
+          <EntryDeleteButton onClick={this.props.clickDeleteEntry} id={entry.id}/>
+          </tr>
       );
     }
   }
