@@ -5,7 +5,7 @@ var ListClass = React.createClass({
       all_lists: this.loadLists(),
       changedEntries: {},
       selectedList: {id: this.getMilliseconds()+"helloWorld",
-        name: "List",
+        name: "Probeaufgabe",
         type: "standard",
         entries: [
           {id:this.getMilliseconds()+"X",
@@ -77,6 +77,9 @@ var ListClass = React.createClass({
   },
 
   createNewListInput: function() {
+    /**
+    * Builds the "create new list" row
+    */
     return (
       <form id="newListForm">
         <label>New List:
@@ -97,6 +100,9 @@ var ListClass = React.createClass({
   },
 
   handleEntryChange: function(evt) {
+    /**
+    * Saves the changes of entries in a map; key is the id of the entry, witch has chaneged.
+    */
     var id = evt.target.id;
     var value = evt.target.value;
     var entriesMap = this.state.changedEntries;
@@ -105,6 +111,9 @@ var ListClass = React.createClass({
   },
 
   clickNewList: function() {
+    /*
+    * Handles the "Create new list" button
+    */
     var listName = this.state.inputValue;
     var listType = this.refs.typeOption.value;
     var newList = {
@@ -123,12 +132,18 @@ var ListClass = React.createClass({
   },
 
   clickSelectListe: function(evt) {
+    /*
+    * Handles the "Select" Button, sets the selectedList.
+    */
     var id = evt.target.id;
     var list = this.getListForID(id)
     this.setState({selectedList: list});
   },
 
   clickDeleteListe: function(evt) {
+    /*
+    * Handles the "Delete" Button for Lists.
+    */
     var id = evt.target.id;
     var list = this.getListForID(id)
     var deleteIndex = null;
@@ -147,6 +162,9 @@ var ListClass = React.createClass({
   },
 
   clickNewEntry: function(evt) {
+    /*
+    * Create a new entry for the selectedList.
+    */
     var list = this.state.selectedList;
     var inputValue = document.getElementById(list.id+"text").value;
     console.log("New entry: "+inputValue);
@@ -163,6 +181,9 @@ var ListClass = React.createClass({
   },
 
   clickUpdateEntry: function(evt) {
+    /*
+    * Make a entry ready to update (hidden = false) or updates an entry.
+    */
     var id = evt.target.id;
     var list = this.state.selectedList;
     var type = list.type;
@@ -232,6 +253,9 @@ var ListClass = React.createClass({
 });
 
 var ListItem = React.createClass({
+  /*
+  * Class for a ListItem.
+  */
   render: function() {
     var list = this.props.list;
     return(
@@ -247,6 +271,9 @@ var ListItem = React.createClass({
 });
 
 var ListEntries = React.createClass({
+  /*
+  * Class for the entries
+  */
   render: function() {
     var selectedList = this.props.list;
     return(
@@ -277,6 +304,9 @@ var ListEntries = React.createClass({
 });
 
 var EntryItem = React.createClass({
+  /*
+  * Depending on the listType, this class build other entries.
+  */
   render: function() {
     var entry = this.props.entry;
     var type = this.props.type;
@@ -411,6 +441,9 @@ var EntryDeleteButton = React.createClass({
 });
 
 var EntriesButtons = React.createClass({
+  /*
+  * The last line, here are the input fields to create new entries. 
+  */
   render: function() {
     var list = this.props.list;
     return(
